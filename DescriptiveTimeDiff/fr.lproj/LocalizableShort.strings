@@ -1,0 +1,38 @@
+"year" = "an";
+"%d an (plural rule: one)" = "%d an";
+"%d an (plural rule: other)" = "%d ans";
+
+
+"month" = "mois";
+"%d mois (plural rule: one)" = "%d mois";
+"%d mois (plural rule: other)" = "%d mois";
+
+
+"week" = "semaine";
+"%d semaine (plural rule: one)" = "%d sem.";
+"%d semaine (plural rule: other)" = "%d sem.";
+
+
+"day" = "jour";
+"%d jour (plural rule: one)" = "%dj";
+"%d jour (plural rule: other)" = "%dj";
+
+
+"hour" = "heure";
+"%d heure (plural rule: one)" = "%dh";
+"%d heure (plural rule: other)" = "%dh";
+
+
+"minute" = "minute";
+"%d minute (plural rule: one)" = "%d min.";
+"%d minute (plural rule: other)" = "%d min.";
+
+
+"second" = "seconde";
+"%d seconde (plural rule: one)" = "%d sec.";
+"%d seconde (plural rule: other)" = "%d sec.";
+
+
+"UntilFormat" = "jusqu'au %@";
+"LeftFormat" = "dans %@";
+"AgoFormat" = "il y a %@";
