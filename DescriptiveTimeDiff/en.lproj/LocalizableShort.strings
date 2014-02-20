@@ -8,7 +8,7 @@
 "%d month (plural rule: other)" = "%dmo";
 
 
-"week" = "semaine";
+"week" = "week";
 "%d week (plural rule: one)" = "%dw";
 "%d week (plural rule: other)" = "%dw";
 

@@ -13,6 +13,10 @@ typedef NS_ENUM(NSInteger, DescriptiveTimeDiffType)
 
 @interface NSDate (DescriptiveTimeDiff)
 
-- (NSString *)stringWithHumanizedTimeDifference:(DescriptiveTimeDiffType)humanizedType withFullString:(BOOL)fullStrings;
+- (NSString *)descriptiveTimeDifferenceWithType:(DescriptiveTimeDiffType)type
+                                 withFullString:(BOOL)isFullStrings;
 
+- (NSString *)descriptiveTimeDifferenceWithDate:(NSDate *)date
+                                           type:(DescriptiveTimeDiffType)type
+                                 withFullString:(BOOL)isFullStrings;
 @end

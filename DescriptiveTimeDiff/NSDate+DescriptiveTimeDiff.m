@@ -10,7 +10,7 @@
 #define LOCALISABLE_FULL    @"LocalizableFull"
 #define LOCALISABLE_SHORT   @"LocalizableShort"
 
-#define NSLoca(key) (NSLocalizedStringFromTable(key, translationTable, nil))
+#define NSLoca(key) (NSLocalizedStringFromTable(key, localeTable, nil))
 
 #define UNTIL_FORMAT    (NSLoca(@"UntilFormat"))
 #define LEFT_FORMAT     (NSLoca(@"LeftFormat"))
@@ -19,14 +19,77 @@
 
 @implementation NSDate (DescriptiveTimeDiff)
 
-- (NSString *)stringWithHumanizedTimeDifference:(DescriptiveTimeDiffType)type withFullString:(BOOL)isFullStrings
-{
-    NSTimeInterval timeInterval = [self timeIntervalSinceNow];
+// Constants
+static NSInteger secondsInADay      =   3600*24;
+static NSInteger secondsInAWeek     =   3600*24*7;
+static NSInteger secondsInAMonth    =   3600*24*30;
+static NSInteger secondsInAYear     =   3600*24*365;
+
+#pragma mark - Static formatters
++ (NSDateFormatter *)yearDateFormatter {
+    static NSDateFormatter *yearDateFormatter = nil ;
     
-    NSInteger secondsInADay = 3600*24;
-    NSInteger secondsInAWeek =  3600*24*7;
-    NSInteger secondsInAMonth =  3600*24*30;
-    NSInteger secondsInAYear = 3600*24*365;
+    if (!yearDateFormatter) {
+        yearDateFormatter = [[NSDateFormatter alloc] init];
+        yearDateFormatter.dateFormat = @"YYYY-MM-dd";
+    }
+    
+    return yearDateFormatter;
+}
+
+
++ (NSDateFormatter *)shortDateFormatter {
+    static NSDateFormatter *dateDateFormatter = nil ;
+    
+    if (!dateDateFormatter) {
+        dateDateFormatter = [[NSDateFormatter alloc] init];
+        dateDateFormatter.dateFormat = @"dd MMM.";
+    }
+    
+    return dateDateFormatter;
+}
+
+
++ (NSDateFormatter *)fullDateFormatter {
+    static NSDateFormatter *fullDateDateFormatter = nil ;
+    
+    if (!fullDateDateFormatter) {
+        fullDateDateFormatter = [[NSDateFormatter alloc] init];
+        fullDateDateFormatter.dateFormat = @"dd MMMM";
+    }
+    
+    return fullDateDateFormatter;
+}
+
+
++ (NSDateFormatter *)fullStringDayFormatter {
+    static NSDateFormatter *fullStringDayFormatter = nil ;
+    
+    if (!fullStringDayFormatter) {
+        fullStringDayFormatter = [[NSDateFormatter alloc] init];
+        fullStringDayFormatter.dateFormat = @"EEEE";
+    }
+    
+    return fullStringDayFormatter;
+}
+
+
++ (NSDateFormatter *)shortStringDayFormatter {
+    static NSDateFormatter *shortStringDayFormatter = nil ;
+    
+    if (!shortStringDayFormatter) {
+        shortStringDayFormatter = [[NSDateFormatter alloc] init];
+        shortStringDayFormatter.dateFormat = @"EEE";
+    }
+    
+    return shortStringDayFormatter;
+}
+
+
+#pragma mark - Private methods
+- (NSDateComponents *)timeIntervalComponentsFromTimeInterval:(NSTimeInterval)timeInterval {
+    NSDateComponents *dateComponents = [[NSDateComponents alloc] init];
+    
     NSInteger yearsDiff = abs(timeInterval/secondsInAYear);
     NSInteger monthsDiff = abs(timeInterval/secondsInAMonth);
     NSInteger weeksDiff = abs(timeInterval/secondsInAWeek);
@@ -35,96 +98,88 @@
     NSInteger minutesDiff = llabs((llabs(timeInterval) - ((daysDiff * secondsInADay) + (hoursDiff * 60))) / 60);
     NSInteger secondsDiff = llabs((llabs(timeInterval) - ((daysDiff * secondsInADay) + (minutesDiff * 60))));
     
-    NSString *yearString;
-    NSString *dateString;
-    NSString *monthString;
-    NSString *weekString;
-    NSString *dayString;
-    NSString *hourString;
-    NSString *minuteString;
-    NSString *secondString;
+    dateComponents.year = yearsDiff;
+    dateComponents.month = monthsDiff;
+    dateComponents.week = weeksDiff;
+    dateComponents.day = daysDiff;
+    dateComponents.hour = hoursDiff;
+    dateComponents.minute = minutesDiff;
+    dateComponents.second = secondsDiff;
     
-    NSDateFormatter *yearDateFormatter = [[NSDateFormatter alloc] init];
-    yearDateFormatter.dateFormat = @"YYYY-MM-dd";
+    return dateComponents;
+}
+
+
+- (NSString *)descriptiveTimeDifferenceWithType:(DescriptiveTimeDiffType)type withFullString:(BOOL)isFullStrings {
+    NSString *localeTable = (isFullStrings) ? LOCALISABLE_FULL : LOCALISABLE_SHORT;
     
-    NSDateFormatter *fullYearDateFormatter = [[NSDateFormatter alloc] init];
-    fullYearDateFormatter.dateFormat = @"YYYY-MM-dd";
+    return [self descriptiveTimeDifferenceWithDate:[NSDate date]
+                                              type:type
+                                    withFullString:isFullStrings
+                         descriptiveTimeDifference:^NSString *(NSDateComponents *dateComponents) {
+        
+        NSString *returnString;
+        if (dateComponents.year > 1) {
+            //            returnString = [[self.class yearDateFormatter] stringFromDate:[NSDate dateWithTimeIntervalSinceNow:timeInterval]];
+            returnString = [[self.class yearDateFormatter] stringFromDate:self];
+            if (returnString.length)
+                returnString = [NSString stringWithFormat:UNTIL_FORMAT, returnString];
+        }
+        
+        else if (dateComponents.month > 3) {
+            returnString = [[self.class shortDateFormatter] stringFromDate:self];
+            if (returnString.length)
+                returnString = [NSString stringWithFormat:UNTIL_FORMAT, returnString];
+        }
+        
+        else if (dateComponents.month > 0)
+            return [NSString stringWithFormat:NSLoca(TTTLocalizedPluralStringKeyForCountAndSingularNoun(dateComponents.month, NSLoca(@"month"))), dateComponents.month];
+        
+        else if (dateComponents.week > 0) {
+            returnString = [NSString stringWithFormat:NSLoca(TTTLocalizedPluralStringKeyForCountAndSingularNoun(dateComponents.week, NSLoca(@"week"))), dateComponents.week];
+        }
+        
+        else if (dateComponents.day > 4) {
+            returnString = [NSString stringWithFormat:NSLoca(TTTLocalizedPluralStringKeyForCountAndSingularNoun(dateComponents.day, NSLoca(@"day"))), dateComponents.day];
+        }
+        
+        else if (dateComponents.day > 0) {
+            NSDateFormatter *dayFormatter = (isFullStrings) ? [self.class fullStringDayFormatter] : [self.class shortStringDayFormatter];
+            return [dayFormatter stringFromDate:self];
+        }
+        
+        else if (dateComponents.hour > 0) {
+            returnString = [NSString stringWithFormat:NSLoca(TTTLocalizedPluralStringKeyForCountAndSingularNoun(dateComponents.hour, NSLoca(@"hour"))), dateComponents.hour];
+        }
+        
+        else if (dateComponents.minute > 0) {
+            returnString = [NSString stringWithFormat:NSLoca(TTTLocalizedPluralStringKeyForCountAndSingularNoun(dateComponents.minute, NSLoca(@"minute"))), dateComponents.minute];
+        }
+        else {
+            returnString = [NSString stringWithFormat:NSLoca(TTTLocalizedPluralStringKeyForCountAndSingularNoun(dateComponents.second, NSLoca(@"second"))), dateComponents.second];
+        }
+        
+        // Append format if needed
+        if (type == DescriptiveTimeDiffTypeSuffixLeft)
+            returnString = [NSString stringWithFormat:LEFT_FORMAT, returnString];
+        else if (type == DescriptiveTimeDiffTypeSuffixAgo)
+            returnString = [NSString stringWithFormat:AGO_FORMAT, returnString];
+        
+        return returnString;
+    }];
+}
+
+typedef NSString * (^descriptiveTimeDifference)(NSDateComponents *dateComponents);
+
+
+- (NSString *)descriptiveTimeDifferenceWithDate:(NSDate *)date type:(DescriptiveTimeDiffType)type withFullString:(BOOL)isFullStrings descriptiveTimeDifference:(descriptiveTimeDifference)descriptiveTimeDifferenceBlock {
+    NSTimeInterval timeInterval = [self timeIntervalSinceDate:date];
+    NSDateComponents *dateComponents = [self timeIntervalComponentsFromTimeInterval:timeInterval];
     
-    NSDateFormatter *dateDateFormatter = [[NSDateFormatter alloc] init];
-    dateDateFormatter.dateFormat = @"dd MMM.";
+    if (descriptiveTimeDifferenceBlock)
+        return descriptiveTimeDifferenceBlock(dateComponents);
     
-    NSDateFormatter *fullDateDateFormatter = [[NSDateFormatter alloc] init];
-    fullDateDateFormatter.dateFormat = @"dd MMMM";
-    
-    NSDateFormatter *dayFormatter = [[NSDateFormatter alloc] init];
-    [dayFormatter setDateFormat: (isFullStrings) ? @"EEEE" : @"EEE"];
-    
-    NSString *translationTable = (isFullStrings) ? LOCALISABLE_FULL : LOCALISABLE_SHORT;
-    
-    // DescriptiveTimeDiffTypeSuffixNone
-    yearString = [yearDateFormatter stringFromDate:[NSDate dateWithTimeIntervalSinceNow:timeInterval]];
-    dateString = [dateDateFormatter stringFromDate:[NSDate dateWithTimeIntervalSinceNow:timeInterval]];
-    
-    monthString = [NSString stringWithFormat:NSLoca(TTTLocalizedPluralStringKeyForCountAndSingularNoun(monthsDiff, NSLoca(@"month"))), monthsDiff];
-    weekString = [NSString stringWithFormat:NSLoca(TTTLocalizedPluralStringKeyForCountAndSingularNoun(weeksDiff, NSLoca(@"week"))), weeksDiff];
-    dayString = [NSString stringWithFormat:NSLoca(TTTLocalizedPluralStringKeyForCountAndSingularNoun(daysDiff, NSLoca(@"day"))), daysDiff];
-    hourString = [NSString stringWithFormat:NSLoca(TTTLocalizedPluralStringKeyForCountAndSingularNoun(hoursDiff, NSLoca(@"hour"))), hoursDiff];
-    minuteString = [NSString stringWithFormat:NSLoca(TTTLocalizedPluralStringKeyForCountAndSingularNoun(minutesDiff, NSLoca(@"minute"))), minutesDiff];
-    secondString = [NSString stringWithFormat:NSLoca(TTTLocalizedPluralStringKeyForCountAndSingularNoun(secondsDiff, NSLoca(@"second"))), secondsDiff];
-    
-    NSString *stringFormat;
-    switch (type
-)
-    {
-        case DescriptiveTimeDiffTypeSuffixLeft:
-            stringFormat = LEFT_FORMAT;
-            yearString = [NSString stringWithFormat:UNTIL_FORMAT, yearString];
-            dateString = [NSString stringWithFormat:UNTIL_FORMAT, dateString];
-            break;
-            
-        case DescriptiveTimeDiffTypeSuffixAgo:
-            stringFormat = AGO_FORMAT;
-            break;
-            
-        case DescriptiveTimeDiffTypeSuffixNone:
-        default:
-            // Nothing to add
-            break;
-    }
-    
-    if (stringFormat) {
-        weekString = [NSString stringWithFormat:stringFormat, weekString];
-        dayString = [NSString stringWithFormat:stringFormat, dayString];
-        hourString = [NSString stringWithFormat:stringFormat, hourString];
-        minuteString = [NSString stringWithFormat:stringFormat, minuteString];
-        secondString = [NSString stringWithFormat:stringFormat, secondString];
-    }
-    
-    if (yearsDiff > 1)
-        return yearString;
-    
-    else if (monthsDiff > 3)
-        return dateString;
-    
-    else if (monthsDiff > 0)
-        return monthString;
-    
-    else if (weeksDiff > 0)
-        return weekString;
-    
-    else if (daysDiff > 4)
-        return dayString;
-    
-    else if (daysDiff > 0)
-        return [dayFormatter stringFromDate:self];
-    
-    else if (hoursDiff > 0)
-        return hourString;
-    
-    else if (minutesDiff > 0)
-        return minuteString;
-    
-    return secondString;
+    return nil;
 }
 
 @end
