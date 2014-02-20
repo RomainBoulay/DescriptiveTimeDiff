@@ -31,9 +31,9 @@
     NSInteger monthsDiff = abs(timeInterval/secondsInAMonth);
     NSInteger weeksDiff = abs(timeInterval/secondsInAWeek);
     NSInteger daysDiff = abs(timeInterval/secondsInADay);
-    NSInteger hoursDiff = abs((abs(timeInterval) - (daysDiff * secondsInADay)) / 3600);
-    NSInteger minutesDiff = abs((abs(timeInterval) - ((daysDiff * secondsInADay) + (hoursDiff * 60))) / 60);
-    NSInteger secondsDiff = abs((abs(timeInterval) - ((daysDiff * secondsInADay) + (minutesDiff * 60))));
+    NSInteger hoursDiff = llabs((llabs(timeInterval) - (daysDiff * secondsInADay)) / 3600);
+    NSInteger minutesDiff = llabs((llabs(timeInterval) - ((daysDiff * secondsInADay) + (hoursDiff * 60))) / 60);
+    NSInteger secondsDiff = llabs((llabs(timeInterval) - ((daysDiff * secondsInADay) + (minutesDiff * 60))));
     
     NSString *yearString;
     NSString *dateString;
