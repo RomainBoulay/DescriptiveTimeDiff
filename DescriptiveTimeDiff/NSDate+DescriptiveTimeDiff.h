@@ -7,16 +7,18 @@ typedef NS_ENUM(NSInteger, DescriptiveTimeDiffType)
 {
 	DescriptiveTimeDiffTypeSuffixNone = 0,
     DescriptiveTimeDiffTypeSuffixLeft,
+    DescriptiveTimeDiffTypeSuffixIn,
     DescriptiveTimeDiffTypeSuffixAgo
 };
 
 
-@interface NSDate (DescriptiveTimeDiff)
+//typedef NSString * (^descriptiveTimeDifference)(NSDateComponents *dateComponents);
 
-- (NSString *)descriptiveTimeDifferenceWithType:(DescriptiveTimeDiffType)type
-                                 withFullString:(BOOL)isFullStrings;
+
+@interface NSDate (DescriptiveTimeDiff)
 
 - (NSString *)descriptiveTimeDifferenceWithDate:(NSDate *)date
                                            type:(DescriptiveTimeDiffType)type
-                                 withFullString:(BOOL)isFullStrings;
+                                     fullString:(BOOL)isFullStrings;
+
 @end

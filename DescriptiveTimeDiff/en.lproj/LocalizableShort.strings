@@ -32,6 +32,7 @@
 "%d second (plural rule: one)" = "%ds";
 "%d second (plural rule: other)" = "%ds";
 
-"UntilFormat" = "%@";
+
 "LeftFormat" = "%@ left";
 "AgoFormat" = "%@ ago";
+"InFormat" = "in %@";
