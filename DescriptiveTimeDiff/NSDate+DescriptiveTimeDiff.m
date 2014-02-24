@@ -56,6 +56,36 @@
 
 
 #pragma mark - Public
+- (NSInteger)dayDifferenceWithDate:(NSDate *)aDate {
+    NSDateComponents *components = [self componentsForDifferenceWithDate:aDate];
+    NSInteger days = [components day];
+    return days;
+}
+
+
+- (NSInteger)monthDifferenceWithDate:(NSDate *)aDate {
+    NSDateComponents *components = [self componentsForDifferenceWithDate:aDate];
+    NSInteger months = [components month];
+    return months;
+}
+
+
+- (NSDateComponents *)componentsForDifferenceWithDate:(NSDate *)aDate {
+    NSDate *startDate = self;
+    NSDate *endDate = aDate;
+    
+    NSCalendar *cal = [NSCalendar currentCalendar];
+    NSUInteger unitFlags = NSMonthCalendarUnit | NSDayCalendarUnit;
+    
+    NSDateComponents *components = [cal components:unitFlags
+                                          fromDate:startDate
+                                            toDate:endDate
+                                           options:0];
+    
+    return components;
+}
+
+
 - (NSString *)descriptiveTimeDifferenceWithDate:(NSDate *)date type:(DescriptiveTimeDiffType)type fullString:(BOOL)isFullStrings {
     NSDateComponents *dateComponents = [self componentsForDifferenceWithDate:date];
 
