@@ -13,9 +13,9 @@
 
 #define NSL(key, table) (NSLocalizedStringFromTable(key, table, nil))
 
-#define LEFT_FORMAT(table)     (NSL(@"LeftFormat", table))
-#define AGO_FORMAT(table)      (NSL(@"AgoFormat", table))
-#define IN_FORMAT(table)      (NSL(@"InFormat", table))
+#define LEFT_FORMAT(table)  (NSL(@"LeftFormat", table))
+#define AGO_FORMAT(table)   (NSL(@"AgoFormat", table))
+#define IN_FORMAT(table)    (NSL(@"InFormat", table))
 
 
 @implementation NSDate (DescriptiveTimeDiff)
@@ -23,28 +23,38 @@
 
 #pragma mark - Private
 + (NSString *)stringWithComponents:(NSDateComponents *)dateComponents localizationsTable:(NSString *)table {
+    
     NSString *returnString;
+    NSArray *componentsArray = @[@(dateComponents.year),
+                                 @(dateComponents.month),
+//                                 @(dateComponents.week),
+                                 @(dateComponents.day),
+                                 @(dateComponents.hour),
+                                 @(dateComponents.minute),
+                                 @(dateComponents.second)];
+    
+    NSArray *localizationKeyArray = @[@"year",
+                                      @"month",
+//                                      @"week",
+                                      @"day",
+                                      @"hour",
+                                      @"minute",
+                                      @"second"];
+    
+    for (NSInteger index = 0 ; index < componentsArray.count ; ++index) {
+        NSNumber *currentComponentNumber = componentsArray[index];
+        NSInteger currentComponent = ABS(currentComponentNumber.integerValue);
+        
+        if (currentComponent != NSUndefinedDateComponent && currentComponent != 0) {
+            // Compute week number
+            if ([localizationKeyArray[index] isEqualToString:@"day"] && currentComponent > 6)
+                returnString = [self.class stringWithKey:@"week" localizationsTable:table andCount:currentComponent/7];
+            else
+                returnString = [self.class stringWithKey:localizationKeyArray[index] localizationsTable:table andCount:currentComponent];
 
-    if (dateComponents.year > 0)
-        returnString = [self.class stringWithKey:@"year" localizationsTable:table andCount:dateComponents.year];
-    
-    else if (dateComponents.month > 0)
-        returnString = [self.class stringWithKey:@"month" localizationsTable:table andCount:dateComponents.month];
-    
-    else if (dateComponents.week > 0)
-        returnString = [self.class stringWithKey:@"week" localizationsTable:table andCount:dateComponents.week];
-    
-    else if (dateComponents.day > 0)
-        returnString = [self.class stringWithKey:@"day" localizationsTable:table andCount:dateComponents.day];
-    
-    else if (dateComponents.hour > 0)
-        returnString = [self.class stringWithKey:@"hour" localizationsTable:table andCount:dateComponents.hour];
-    
-    else if (dateComponents.minute > 0)
-        returnString = [self.class stringWithKey:@"minute" localizationsTable:table andCount:dateComponents.minute];
-    
-    else if (dateComponents.second > 0)
-        returnString = [self.class stringWithKey:@"second" localizationsTable:table andCount:dateComponents.second];
+            break;
+        }
+    }
     
     return returnString;
 }
@@ -57,26 +67,24 @@
 
 #pragma mark - Public
 - (NSInteger)dayDifferenceWithDate:(NSDate *)aDate {
-    NSDateComponents *components = [self componentsForDifferenceWithDate:aDate];
+    NSDateComponents *components = [self dateComponentsForDifferenceWithDate:aDate unitFlags:NSDayCalendarUnit];
     NSInteger days = [components day];
     return days;
 }
 
 
 - (NSInteger)monthDifferenceWithDate:(NSDate *)aDate {
-    NSDateComponents *components = [self componentsForDifferenceWithDate:aDate];
+    NSDateComponents *components = [self dateComponentsForDifferenceWithDate:aDate unitFlags:NSMonthCalendarUnit];
     NSInteger months = [components month];
     return months;
 }
 
 
-- (NSDateComponents *)componentsForDifferenceWithDate:(NSDate *)aDate {
+- (NSDateComponents *)dateComponentsForDifferenceWithDate:(NSDate *)aDate unitFlags:(NSCalendarUnit)unitFlags {
     NSDate *startDate = self;
     NSDate *endDate = aDate;
     
     NSCalendar *cal = [NSCalendar currentCalendar];
-    NSUInteger unitFlags = NSMonthCalendarUnit | NSDayCalendarUnit;
-    
     NSDateComponents *components = [cal components:unitFlags
                                           fromDate:startDate
                                             toDate:endDate
@@ -86,21 +94,59 @@
 }
 
 
-- (NSString *)descriptiveTimeDifferenceWithDate:(NSDate *)date type:(DescriptiveTimeDiffType)type fullString:(BOOL)isFullStrings {
-    NSDateComponents *dateComponents = [self componentsForDifferenceWithDate:date];
+- (NSString *)specialCasesWithComponents:(NSDateComponents *)components
+                                    type:(DescriptiveTimeDiffType)type
+                              fullString:(BOOL)isFullStrings
+                      localizationsTable:(NSString *)table {
+    
+    if (type == DescriptiveTimeDiffTypeSuffixIn
+        && (components.year == NSUndefinedDateComponent || components.year == 0)
+        && (components.month == NSUndefinedDateComponent || components.month == 0)) {
+        
+        if (components.day == 1)
+            return NSL(@"tomorrow", table);
+        else if (components.day == 0)
+            return NSL(@"today", table);
+    }
+    
+    return nil;
+}
 
-    // Determining string format with given type
+
+- (NSString *)descriptiveTimeDifferenceWithDate:(NSDate *)date type:(DescriptiveTimeDiffType)type fullString:(BOOL)isFullStrings {
+    // Compute time interval
+    NSCalendarUnit unitFlags = NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond;
+    NSDateComponents *dateComponents = [self dateComponentsForDifferenceWithDate:date unitFlags:unitFlags];
     NSString *localizationsTable = (isFullStrings) ? LOCALISABLE_FULL : LOCALISABLE_SHORT;
+    
+    
+    // Special case pass
+    NSString *specialCaseString = [self specialCasesWithComponents:dateComponents type:type fullString:isFullStrings localizationsTable:localizationsTable];
+    if (specialCaseString)
+        return specialCaseString;
+    
+    
+    // Determining string format with given type
     NSString *format;
-    if (type == DescriptiveTimeDiffTypeSuffixLeft)
-        format = LEFT_FORMAT(localizationsTable);
+    switch (type) {
+        case DescriptiveTimeDiffTypeSuffixLeft:
+            format = LEFT_FORMAT(localizationsTable);
+            break;
+            
+        case DescriptiveTimeDiffTypeSuffixAgo:
+            format = AGO_FORMAT(localizationsTable);
+            break;
+            
+        case DescriptiveTimeDiffTypeSuffixIn:
+            format = IN_FORMAT(localizationsTable);
+            break;
+            
+        default:
+            break;
+    }
     
-    else if (type == DescriptiveTimeDiffTypeSuffixAgo)
-        format = AGO_FORMAT(localizationsTable);
     
-    else if (type == DescriptiveTimeDiffTypeSuffixIn)
-        format = IN_FORMAT(localizationsTable);
-    
+    // Aggregate returned string
     NSString *description = [self.class stringWithComponents:dateComponents localizationsTable:localizationsTable];
     
     if (description.length)
