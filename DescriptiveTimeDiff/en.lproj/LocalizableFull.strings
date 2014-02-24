@@ -36,3 +36,7 @@
 "LeftFormat" = "%@ left";
 "AgoFormat" = "%@ ago";
 "InFormat" = "in %@";
+
+// Special cases
+"tomorrow" = "tomorrow";
+"today" = "today";

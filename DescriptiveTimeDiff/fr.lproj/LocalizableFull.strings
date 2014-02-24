@@ -36,3 +36,7 @@
 "LeftFormat" = "encore %@";
 "AgoFormat" = "il y a %@";
 "InFormat" = "dans %@";
+
+// Special cases
+"tomorrow" = "demain";
+"today" = "aujourd'hui";
