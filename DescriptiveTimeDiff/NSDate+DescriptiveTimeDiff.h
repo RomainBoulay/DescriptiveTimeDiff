@@ -21,6 +21,10 @@ typedef NS_ENUM(NSInteger, DescriptiveTimeDiffType)
 
 - (NSInteger)dayDifferenceWithDate:(NSDate *)aDate;
 - (NSInteger)monthDifferenceWithDate:(NSDate *)aDate;
-- (NSDateComponents *)componentsForDifferenceWithDate:(NSDate *)aDate;
+- (NSDateComponents *)dateComponentsForDifferenceWithDate:(NSDate *)aDate unitFlags:(NSCalendarUnit)unitFlags;
+
+- (NSInteger)day;
+- (NSInteger)month;
+- (NSInteger)year;
 
 @end

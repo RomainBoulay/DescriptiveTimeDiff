@@ -22,12 +22,30 @@
 
 
 #pragma mark - Private
+- (NSString *)specialCasesWithComponents:(NSDateComponents *)components
+                                    type:(DescriptiveTimeDiffType)type
+                              fullString:(BOOL)isFullStrings
+                      localizationsTable:(NSString *)table {
+    
+    if (type == DescriptiveTimeDiffTypeSuffixIn
+        && (components.year == NSUndefinedDateComponent || components.year == 0)
+        && (components.month == NSUndefinedDateComponent || components.month == 0)) {
+        
+        if (components.day == 1)
+            return NSL(@"tomorrow", table);
+        else if (components.day == 0)
+            return NSL(@"today", table);
+    }
+    
+    return nil;
+}
+
+
 + (NSString *)stringWithComponents:(NSDateComponents *)dateComponents localizationsTable:(NSString *)table {
     
     NSString *returnString;
     NSArray *componentsArray = @[@(dateComponents.year),
                                  @(dateComponents.month),
-//                                 @(dateComponents.week),
                                  @(dateComponents.day),
                                  @(dateComponents.hour),
                                  @(dateComponents.minute),
@@ -35,7 +53,6 @@
     
     NSArray *localizationKeyArray = @[@"year",
                                       @"month",
-//                                      @"week",
                                       @"day",
                                       @"hour",
                                       @"minute",
@@ -65,7 +82,35 @@
 }
 
 
+- (NSDateComponents *)dateComponentsWithUnitFlags:(NSCalendarUnit)unitFlags {
+    NSCalendar *cal = [NSCalendar currentCalendar];
+    NSDateComponents *components = [cal components:unitFlags fromDate:self];
+    return components;
+}
+
+
 #pragma mark - Public
+- (NSInteger)day {
+    NSDateComponents *components = [self dateComponentsWithUnitFlags:NSDayCalendarUnit];
+    NSInteger day = [components day];
+    return day;
+}
+
+
+- (NSInteger)month {
+    NSDateComponents *components = [self dateComponentsWithUnitFlags:NSMonthCalendarUnit];
+    NSInteger month = [components month];
+    return month;
+}
+
+
+- (NSInteger)year {
+    NSDateComponents *components = [self dateComponentsWithUnitFlags:NSYearCalendarUnit];
+    NSInteger year = [components year];
+    return year;
+}
+
+
 - (NSInteger)dayDifferenceWithDate:(NSDate *)aDate {
     NSDateComponents *components = [self dateComponentsForDifferenceWithDate:aDate unitFlags:NSDayCalendarUnit];
     NSInteger days = [components day];
@@ -91,25 +136,6 @@
                                            options:0];
     
     return components;
-}
-
-
-- (NSString *)specialCasesWithComponents:(NSDateComponents *)components
-                                    type:(DescriptiveTimeDiffType)type
-                              fullString:(BOOL)isFullStrings
-                      localizationsTable:(NSString *)table {
-    
-    if (type == DescriptiveTimeDiffTypeSuffixIn
-        && (components.year == NSUndefinedDateComponent || components.year == 0)
-        && (components.month == NSUndefinedDateComponent || components.month == 0)) {
-        
-        if (components.day == 1)
-            return NSL(@"tomorrow", table);
-        else if (components.day == 0)
-            return NSL(@"today", table);
-    }
-    
-    return nil;
 }
 
 
@@ -154,5 +180,6 @@
     
     return (description.length) ? description : nil;
 }
+
 
 @end
