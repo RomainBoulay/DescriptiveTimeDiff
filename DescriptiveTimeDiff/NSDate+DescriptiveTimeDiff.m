@@ -58,7 +58,7 @@
                                       @"minute",
                                       @"second"];
     
-    for (NSInteger index = 0 ; index < componentsArray.count ; ++index) {
+    for (NSUInteger index = 0 ; index < componentsArray.count ; ++index) {
         NSNumber *currentComponentNumber = componentsArray[index];
         NSInteger currentComponent = ABS(currentComponentNumber.integerValue);
         
