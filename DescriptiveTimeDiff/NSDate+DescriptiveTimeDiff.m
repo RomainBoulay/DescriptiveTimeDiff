@@ -175,7 +175,7 @@
     // Aggregate returned string
     NSString *description = [self.class stringWithComponents:dateComponents localizationsTable:localizationsTable];
     
-    if (description.length)
+    if (format.length && description.length)
         description = [NSString stringWithFormat:format, description];
     
     return (description.length) ? description : nil;
