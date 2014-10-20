@@ -70,6 +70,18 @@ static NSString *CellIdentifier = @"Cell";
 }
 
 
+- (IBAction)displayVerbose:(id)sender {
+    [self.switchControl setOn:YES animated:YES];
+    [self.tableView reloadData];
+}
+
+
+- (IBAction)displayShort:(id)sender {
+    [self.switchControl setOn:NO animated:YES];
+    [self.tableView reloadData];
+}
+
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     
@@ -77,7 +89,7 @@ static NSString *CellIdentifier = @"Cell";
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
     
     NSDate *date = [self.items  objectAtIndex:indexPath.row];
-    [cell.textLabel setText:[date stringWithHumanizedTimeDifference:self.timeDiffType withFullString:self.switchControl.on]];
+    [cell.textLabel setText:[date descriptiveTimeDifferenceWithDate:[NSDate date] type:self.timeDiffType fullString:self.switchControl.on]];
     [cell.textLabel setTextColor:[UIColor blackColor]];
     
     return cell;

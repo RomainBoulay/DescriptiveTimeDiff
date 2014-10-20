@@ -39,6 +39,7 @@
 
 /* Begin PBXFileReference section */
 		25DED3AD05D245EE9B8E8D8D /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		3380A0FD19F5679900F796F5 /* DescriptiveTimeDiff.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; name = DescriptiveTimeDiff.podspec; path = ../../DescriptiveTimeDiff.podspec; sourceTree = "<group>"; };
 		33F59B1F18B631FF000E4E7B /* DescriptiveTimeDiffDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DescriptiveTimeDiffDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		33F59B2218B631FF000E4E7B /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		33F59B2418B631FF000E4E7B /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -133,6 +134,7 @@
 				33F59B3418B631FF000E4E7B /* Main_iPhone.storyboard */,
 				33F59B3A18B631FF000E4E7B /* ViewController.h */,
 				33F59B3B18B631FF000E4E7B /* ViewController.m */,
+				3380A0FD19F5679900F796F5 /* DescriptiveTimeDiff.podspec */,
 				33F59B3D18B631FF000E4E7B /* Images.xcassets */,
 				33F59B2918B631FF000E4E7B /* Supporting Files */,
 			);
