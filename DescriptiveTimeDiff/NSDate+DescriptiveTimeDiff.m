@@ -21,74 +21,6 @@
 @implementation NSDate (DescriptiveTimeDiff)
 
 
-#pragma mark - Private
-- (NSString *)specialCasesWithComponents:(NSDateComponents *)components
-                                    type:(DescriptiveTimeDiffType)type
-                              fullString:(BOOL)isFullStrings
-                      localizationsTable:(NSString *)table {
-    
-    if (type == DescriptiveTimeDiffTypeSuffixIn
-        && (components.year == NSUndefinedDateComponent || components.year == 0)
-        && (components.month == NSUndefinedDateComponent || components.month == 0)) {
-        
-        if (components.day == 1)
-            return NSL(@"tomorrow", table);
-        else if (components.day == 0)
-            return NSL(@"today", table);
-    }
-    
-    return nil;
-}
-
-
-+ (NSString *)stringWithComponents:(NSDateComponents *)dateComponents localizationsTable:(NSString *)table {
-    
-    NSString *returnString;
-    NSArray *componentsArray = @[@(dateComponents.year),
-                                 @(dateComponents.month),
-                                 @(dateComponents.day),
-                                 @(dateComponents.hour),
-                                 @(dateComponents.minute),
-                                 @(dateComponents.second)];
-    
-    NSArray *localizationKeyArray = @[@"year",
-                                      @"month",
-                                      @"day",
-                                      @"hour",
-                                      @"minute",
-                                      @"second"];
-    
-    for (NSUInteger index = 0 ; index < componentsArray.count ; ++index) {
-        NSNumber *currentComponentNumber = componentsArray[index];
-        NSInteger currentComponent = ABS(currentComponentNumber.integerValue);
-        
-        if (currentComponent != NSUndefinedDateComponent && currentComponent != 0) {
-            // Compute week number
-            if ([localizationKeyArray[index] isEqualToString:@"day"] && currentComponent > 6)
-                returnString = [self.class stringWithKey:@"week" localizationsTable:table andCount:currentComponent/7];
-            else
-                returnString = [self.class stringWithKey:localizationKeyArray[index] localizationsTable:table andCount:currentComponent];
-
-            break;
-        }
-    }
-    
-    return returnString;
-}
-
-
-+ (NSString *)stringWithKey:(NSString *)i18nKey localizationsTable:(NSString *)table andCount:(NSInteger)count {
-    return [NSString stringWithFormat:NSL(TTTLocalizedPluralStringKeyForCountAndSingularNoun(count, NSL(i18nKey, table)), table), count];
-}
-
-
-- (NSDateComponents *)dateComponentsWithUnitFlags:(NSCalendarUnit)unitFlags {
-    NSCalendar *cal = [NSCalendar currentCalendar];
-    NSDateComponents *components = [cal components:unitFlags fromDate:self];
-    return components;
-}
-
-
 #pragma mark - Public
 - (NSInteger)day {
     NSDateComponents *components = [self dateComponentsWithUnitFlags:NSDayCalendarUnit];
@@ -145,13 +77,80 @@
     NSDateComponents *dateComponents = [self dateComponentsForDifferenceWithDate:date unitFlags:unitFlags];
     NSString *localizationsTable = (isFullStrings) ? LOCALISABLE_FULL : LOCALISABLE_SHORT;
     
-    
     // Special case pass
     NSString *specialCaseString = [self specialCasesWithComponents:dateComponents type:type fullString:isFullStrings localizationsTable:localizationsTable];
-    if (specialCaseString)
-        return specialCaseString;
+    return (specialCaseString) ?: [self descriptionWithType:type dateComponents:dateComponents localizationsTable:localizationsTable];
+}
+
+
+#pragma mark - Private
+- (NSString *)specialCasesWithComponents:(NSDateComponents *)components
+                                    type:(DescriptiveTimeDiffType)type
+                              fullString:(BOOL)isFullStrings
+                      localizationsTable:(NSString *)table {
     
+    if (type == DescriptiveTimeDiffTypeSuffixIn
+        && (components.year == NSUndefinedDateComponent || components.year == 0)
+        && (components.month == NSUndefinedDateComponent || components.month == 0)) {
+        
+        if (components.day == 1)
+            return NSL(@"tomorrow", table);
+        else if (components.day == 0)
+            return NSL(@"today", table);
+    }
     
+    return nil;
+}
+
+
++ (NSString *)stringWithComponents:(NSDateComponents *)dateComponents localizationsTable:(NSString *)table {
+    NSString *returnString;
+    NSArray *componentsArray = @[@(dateComponents.year),
+                                 @(dateComponents.month),
+                                 @(dateComponents.day),
+                                 @(dateComponents.hour),
+                                 @(dateComponents.minute),
+                                 @(dateComponents.second)];
+    
+    NSArray *localizationKeyArray = @[@"year",
+                                      @"month",
+                                      @"day",
+                                      @"hour",
+                                      @"minute",
+                                      @"second"];
+    
+    for (NSUInteger index = 0 ; index < componentsArray.count ; ++index) {
+        NSNumber *currentComponentNumber = componentsArray[index];
+        NSInteger currentComponent = ABS(currentComponentNumber.integerValue);
+        
+        if (currentComponent != NSUndefinedDateComponent && currentComponent != 0) {
+            // Compute week number
+            if ([localizationKeyArray[index] isEqualToString:@"day"] && currentComponent > 6)
+                returnString = [self.class stringWithKey:@"week" localizationsTable:table andCount:currentComponent/7];
+            else
+                returnString = [self.class stringWithKey:localizationKeyArray[index] localizationsTable:table andCount:currentComponent];
+            
+            break;
+        }
+    }
+    
+    return returnString;
+}
+
+
++ (NSString *)stringWithKey:(NSString *)i18nKey localizationsTable:(NSString *)table andCount:(NSInteger)count {
+    return [NSString stringWithFormat:NSL(TTTLocalizedPluralStringKeyForCountAndSingularNoun(count, NSL(i18nKey, table)), table), count];
+}
+
+
+- (NSDateComponents *)dateComponentsWithUnitFlags:(NSCalendarUnit)unitFlags {
+    NSCalendar *cal = [NSCalendar currentCalendar];
+    NSDateComponents *components = [cal components:unitFlags fromDate:self];
+    return components;
+}
+
+
+- (NSString *)descriptionWithType:(DescriptiveTimeDiffType)type dateComponents:(NSDateComponents *)dateComponents localizationsTable:(NSString *)localizationsTable {
     // Determining string format with given type
     NSString *format;
     switch (type) {
@@ -170,7 +169,6 @@
         default:
             break;
     }
-    
     
     // Aggregate returned string
     NSString *description = [self.class stringWithComponents:dateComponents localizationsTable:localizationsTable];
