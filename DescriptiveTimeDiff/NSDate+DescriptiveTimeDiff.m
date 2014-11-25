@@ -6,7 +6,6 @@
 #import "NSDate+DescriptiveTimeDiff.h"
 
 #import "TTTLocalizedPluralString.h"
-//#import "NSDate+Utils.h"
 
 #define LOCALISABLE_FULL    @"LocalizableFull"
 #define LOCALISABLE_SHORT   @"LocalizableShort"
@@ -22,52 +21,52 @@
 
 
 #pragma mark - Public
+- (BOOL)isSameDay:(NSDate *)comparedDate {
+    return [self isEqualToDate:comparedDate unitFlags:(NSYearCalendarUnit|NSMonthCalendarUnit|NSDayCalendarUnit)];
+}
+
+
+- (BOOL)isSameMonth:(NSDate *)comparedDate {
+    return [self isEqualToDate:comparedDate unitFlags:(NSYearCalendarUnit|NSMonthCalendarUnit)];
+}
+
+
+- (BOOL)isSameYear:(NSDate *)comparedDate {
+    return [self isEqualToDate:comparedDate unitFlags:NSYearCalendarUnit];
+}
+
+
 - (NSInteger)day {
-    NSDateComponents *components = [self dateComponentsWithUnitFlags:NSDayCalendarUnit];
-    NSInteger day = [components day];
-    return day;
+    return [[self dateComponentsWithUnitFlags:NSDayCalendarUnit] day];
 }
 
 
 - (NSInteger)month {
-    NSDateComponents *components = [self dateComponentsWithUnitFlags:NSMonthCalendarUnit];
-    NSInteger month = [components month];
-    return month;
+    return [[self dateComponentsWithUnitFlags:NSMonthCalendarUnit] month];
 }
 
 
 - (NSInteger)year {
-    NSDateComponents *components = [self dateComponentsWithUnitFlags:NSYearCalendarUnit];
-    NSInteger year = [components year];
-    return year;
+    return [[self dateComponentsWithUnitFlags:NSYearCalendarUnit] year];
 }
 
 
-- (NSInteger)dayDifferenceWithDate:(NSDate *)aDate {
-    NSDateComponents *components = [self dateComponentsForDifferenceWithDate:aDate unitFlags:NSDayCalendarUnit];
-    NSInteger days = [components day];
-    return days;
+- (NSInteger)dayDifferenceWithDate:(NSDate *)otherDate {
+    return [self differenceWithDate:otherDate unitFlags:(NSYearCalendarUnit|NSMonthCalendarUnit|NSDayCalendarUnit) differenceExtraction:^NSInteger(NSDateComponents *dateComponents) {
+        return [dateComponents day];
+    }];
 }
 
 
-- (NSInteger)monthDifferenceWithDate:(NSDate *)aDate {
-    NSDateComponents *components = [self dateComponentsForDifferenceWithDate:aDate unitFlags:NSMonthCalendarUnit];
-    NSInteger months = [components month];
-    return months;
+- (NSInteger)monthDifferenceWithDate:(NSDate *)otherDate {
+    return [self differenceWithDate:otherDate unitFlags:(NSYearCalendarUnit|NSMonthCalendarUnit) differenceExtraction:^NSInteger(NSDateComponents *dateComponents) {
+        return [dateComponents month];
+    }];
 }
 
 
-- (NSDateComponents *)dateComponentsForDifferenceWithDate:(NSDate *)aDate unitFlags:(NSCalendarUnit)unitFlags {
-    NSDate *startDate = self;
-    NSDate *endDate = aDate;
-    
-    NSCalendar *cal = [NSCalendar currentCalendar];
-    NSDateComponents *components = [cal components:unitFlags
-                                          fromDate:startDate
-                                            toDate:endDate
-                                           options:0];
-    
-    return components;
+- (NSDateComponents *)dateComponentsForDifferenceWithDate:(NSDate *)otherDate unitFlags:(NSCalendarUnit)unitFlags {
+    return [[NSCalendar currentCalendar] components:unitFlags fromDate:self toDate:otherDate options:0];
 }
 
 
@@ -84,6 +83,31 @@
 
 
 #pragma mark - Private
+- (NSInteger)differenceWithDate:(NSDate *)otherDate unitFlags:(NSCalendarUnit)unitFlags differenceExtraction:(NSInteger (^)(NSDateComponents *dateComponents))extractionDifference {
+    NSParameterAssert(otherDate && extractionDifference);
+    NSDate *simplifiedSelfDate = [self simplifiedDateWithUnitFlags:unitFlags];
+    NSDate *simplifiedOtherDate = [otherDate simplifiedDateWithUnitFlags:unitFlags];
+    
+    NSDateComponents *components = [simplifiedSelfDate dateComponentsForDifferenceWithDate:simplifiedOtherDate unitFlags:unitFlags];
+    return extractionDifference(components);
+}
+
+
+- (BOOL)isEqualToDate:(NSDate *)otherDate unitFlags:(NSCalendarUnit)unitFlags {
+    NSParameterAssert(otherDate);
+    NSDate *simplifiedSelfDate = [self simplifiedDateWithUnitFlags:unitFlags];
+    NSDate *simplifiedOtherDate = [otherDate simplifiedDateWithUnitFlags:unitFlags];
+    return [simplifiedSelfDate isEqualToDate:simplifiedOtherDate];
+}
+
+
+- (NSDate *)simplifiedDateWithUnitFlags:(NSCalendarUnit)unitFlags {
+    NSCalendar *cal = [NSCalendar currentCalendar];
+    NSDateComponents *components = [cal components:unitFlags fromDate:self];
+    return [cal dateFromComponents:components];
+}
+
+
 - (NSString *)specialCasesWithComponents:(NSDateComponents *)components
                                     type:(DescriptiveTimeDiffType)type
                               fullString:(BOOL)isFullStrings
@@ -93,6 +117,7 @@
         && (components.year == NSUndefinedDateComponent || components.year == 0)
         && (components.month == NSUndefinedDateComponent || components.month == 0)) {
         
+        NSAssert(components.day >= 0, @"Comparison should be always positive, check the order");
         if (components.day == 1)
             return NSL(@"tomorrow", table);
         else if (components.day == 0)

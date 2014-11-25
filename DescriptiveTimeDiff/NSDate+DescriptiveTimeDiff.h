@@ -19,12 +19,16 @@ typedef NS_ENUM(NSInteger, DescriptiveTimeDiffType)
                                      fullString:(BOOL)isFullStrings;
 
 
-- (NSInteger)dayDifferenceWithDate:(NSDate *)aDate;
-- (NSInteger)monthDifferenceWithDate:(NSDate *)aDate;
-- (NSDateComponents *)dateComponentsForDifferenceWithDate:(NSDate *)aDate unitFlags:(NSCalendarUnit)unitFlags;
+- (NSInteger)dayDifferenceWithDate:(NSDate *)otherDate;
+- (NSInteger)monthDifferenceWithDate:(NSDate *)otherDate;
+- (NSDateComponents *)dateComponentsForDifferenceWithDate:(NSDate *)otherDate unitFlags:(NSCalendarUnit)unitFlags;
 
 - (NSInteger)day;
 - (NSInteger)month;
 - (NSInteger)year;
+
+- (BOOL)isSameDay:(NSDate *)comparedDate;
+- (BOOL)isSameMonth:(NSDate *)comparedDate;
+- (BOOL)isSameYear:(NSDate *)comparedDate;
 
 @end
