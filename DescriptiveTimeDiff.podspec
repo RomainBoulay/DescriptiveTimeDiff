@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
   s.author = { 'Romain Boulay' => 'https://twitter.com/r_boulay' }
   s.source = { :git => 'https://github.com/RomainBoulay/DescriptiveTimeDiff.git', :tag => "#{s.version}" }
   s.source_files = 'DescriptiveTimeDiff/*.{h,m}'
-  s.resources = 'DescriptiveTimeDiff/{en,fr,de,it,nl}.lproj'
+  s.resources = 'DescriptiveTimeDiff/{en,fr,de,it,nl,es}.lproj'
 
   s.frameworks = 'Foundation'
   s.dependency 'TTTLocalizedPluralString', '~> 0.0.9'
