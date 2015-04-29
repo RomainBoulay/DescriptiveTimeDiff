@@ -1,26 +1,26 @@
 "year" = "an";
-"%d an (plural rule: one)" = "%d an";
-"%d an (plural rule: other)" = "%d ans";
+"%d year (plural rule: one)" = "%d an";
+"%d year (plural rule: other)" = "%d ans";
 
 
 "month" = "mois";
-"%d mois (plural rule: one)" = "%d mois";
-"%d mois (plural rule: other)" = "%d mois";
+"%d month (plural rule: one)" = "%d mois";
+"%d month (plural rule: other)" = "%d mois";
 
 
 "week" = "semaine";
-"%d semaine (plural rule: one)" = "%d sem.";
-"%d semaine (plural rule: other)" = "%d sem.";
+"%d week (plural rule: one)" = "%d sem.";
+"%d week (plural rule: other)" = "%d sem.";
 
 
 "day" = "jour";
-"%d jour (plural rule: one)" = "%dj";
-"%d jour (plural rule: other)" = "%dj";
+"%d day (plural rule: one)" = "%dj";
+"%d day (plural rule: other)" = "%dj";
 
 
 "hour" = "heure";
-"%d heure (plural rule: one)" = "%dh";
-"%d heure (plural rule: other)" = "%dh";
+"%d hour (plural rule: one)" = "%dh";
+"%d hour (plural rule: other)" = "%dh";
 
 
 "minute" = "minute";
@@ -29,8 +29,8 @@
 
 
 "second" = "seconde";
-"%d seconde (plural rule: one)" = "%d sec.";
-"%d seconde (plural rule: other)" = "%d sec.";
+"%d second (plural rule: one)" = "%d sec.";
+"%d second (plural rule: other)" = "%d sec.";
 
 
 "LeftFormat" = "encore %@";

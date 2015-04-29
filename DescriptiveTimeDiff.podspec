@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = 'DescriptiveTimeDiff'
-  s.version = '0.2'
+  s.version = '0.3'
   s.platform = :ios, '6.0'
   s.ios.deployment_target = '6.0'
   s.license = 'MIT'
@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
   s.author = { 'Romain Boulay' => 'https://twitter.com/r_boulay' }
   s.source = { :git => 'https://github.com/RomainBoulay/DescriptiveTimeDiff.git', :tag => "#{s.version}" }
   s.source_files = 'DescriptiveTimeDiff/*.{h,m}'
-  s.resources = 'DescriptiveTimeDiff/{en,fr}.lproj'
+  s.resources = 'DescriptiveTimeDiff/{en,fr,de,it,nl,es}.lproj'
 
   s.frameworks = 'Foundation'
   s.dependency 'TTTLocalizedPluralString', '~> 0.0.9'

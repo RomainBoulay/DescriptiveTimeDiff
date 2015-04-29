@@ -1,0 +1,42 @@
+"year" = "año";
+"%d year (plural rule: one)" = "%d año";
+"%d year (plural rule: other)" = "%d años";
+
+
+"month" = "month";
+"%d month (plural rule: one)" = "%d mes";
+"%d month (plural rule: other)" = "%d meses";
+
+
+"week" = "week";
+"%d week (plural rule: one)" = "%d semana";
+"%d week (plural rule: other)" = "%d semanas";
+
+
+"day" = "day";
+"%d day (plural rule: one)" = "%d día";
+"%d day (plural rule: other)" = "%d días";
+
+
+"hour" = "hour";
+"%d hour (plural rule: one)" = "%d hora";
+"%d hour (plural rule: other)" = "%d horas";
+
+
+"minute" = "minute";
+"%d minute (plural rule: one)" = "%d minuto";
+"%d minute (plural rule: other)" = "%d minutos";
+
+
+"second" = "second";
+"%d second (plural rule: one)" = "%d segundo";
+"%d second (plural rule: other)" = "%d segundos";
+
+
+"LeftFormat" = "%@ restantes";
+"AgoFormat" = "hace %@";
+"InFormat" = "en %@";
+
+// Special cases
+"tomorrow" = "mañana";
+"today" = "hoy";

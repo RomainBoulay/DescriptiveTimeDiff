@@ -1,0 +1,42 @@
+"year" = "jaar";
+"%d year (plural rule: one)" = "%dj";
+"%d year (plural rule: other)" = "%dj";
+
+
+"month" = "maand";
+"%d month (plural rule: one)" = "%dm";
+"%d month (plural rule: other)" = "%dm";
+
+
+"week" = "week";
+"%d week (plural rule: one)" = "%dw";
+"%d week (plural rule: other)" = "%dw";
+
+
+"day" = "dag";
+"%d day (plural rule: one)" = "%dd";
+"%d day (plural rule: other)" = "%dd";
+
+
+"hour" = "uur";
+"%d hour (plural rule: one)" = "%du";
+"%d hour (plural rule: other)" = "%du";
+
+
+"minute" = "minuut";
+"%d minute (plural rule: one)" = "%dmin";
+"%d minute (plural rule: other)" = "%dmin";
+
+
+"second" = "seconde";
+"%d second (plural rule: one)" = "%dsec";
+"%d second (plural rule: other)" = "%dsec";
+
+
+"LeftFormat" = "%@ links";
+"AgoFormat" = "%@ galaden";
+"InFormat" = "in %@";
+
+// Special cases
+"tomorrow" = "morgen";
+"today" = "vandaag";
